@@ -42,7 +42,7 @@ Sistem bekerja dengan alur sebagai berikut:
 3.  **Transmisi Data:** ESP32 mempublikasikan (publish) semua data sensor ke topik-topik spesifik di broker MQTT.
 4.  **Visualisasi:** Node-RED berlangganan (subscribe) ke topik-topik tersebut, menerima data, dan menampilkannya dalam bentuk *gauges* dan grafik pada dasbor web.
 
-![Flowchart Sistem](assets/gambar-05-flowchart.png)
+![Flowchart Sistem](assets/Flowchart.png)
 *Gambar: Flowchart Logika Sistem*
 
 ---
@@ -52,11 +52,11 @@ Sistem bekerja dengan alur sebagai berikut:
 Dasbor Node-RED menyediakan antarmuka visual untuk memantau semua parameter lingkungan dari jarak jauh.
 
 ### Alur Node-RED
-![Alur Node-RED](assets/gambar-14-nodered-flow.png)
+![Alur Node-RED](assets/NodeRed-Flow.png)
 *Gambar: Alur Node-RED yang menerima data MQTT dan meneruskannya ke UI*
 
 ### Tampilan Dasbor
-![Dasbor Node-RED](assets/gambar-19-dashboard.png)
+![Dasbor Node-RED](assets/NodeRed-Dashboard.png)
 *Gambar: Tampilan dasbor lengkap dengan gauge dan grafik untuk semua sensor*
 
 ---
