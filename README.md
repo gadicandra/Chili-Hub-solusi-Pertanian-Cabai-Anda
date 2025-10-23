@@ -52,7 +52,7 @@ Sistem bekerja dengan alur sebagai berikut:
 Dasbor Node-RED menyediakan antarmuka visual untuk memantau semua parameter lingkungan dari jarak jauh.
 
 ### Alur Node-RED
-![Alur Node-RED](assets/NodeRed-Flow.png)
+![Alur Node-RED](assets/Nodered-Flow.png)
 *Gambar: Alur Node-RED yang menerima data MQTT dan meneruskannya ke UI*
 
 ### Tampilan Dasbor
