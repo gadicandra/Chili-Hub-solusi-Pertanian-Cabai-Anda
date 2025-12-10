@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Chili-Hub Logo](assets/logo.png)
+![Chili-Hub Logo](assets/logo_chili_hub.png)
 
 **Universitas Gadjah Mada - 2025**
 
