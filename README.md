@@ -101,7 +101,7 @@ Aktuator dikendalikan berdasarkan **hasil prediksi model**:
          │   └────┬────────┬───┘
          │        │        │
          │        │        │ Subscribe
-    Subscribe    │        ▼
+     Subscribe    │        ▼
          │        │   ┌──────────┐
          │        │   │Dashboard │  4. Visualization
          │        │   │ (Web UI) │     User Interface
@@ -126,11 +126,11 @@ ESP32 membaca sensor setiap 5 detik dan publish data:
 ```json
 Topic: chilihub/data/sensors
 Payload: {
-  "temperature": 28.5,
-  "humidity": 65.2,
-  "soil_moisture": 45.3,
-  "light_intensity": 720,
-  "timestamp": "2025-12-10T14:30:22Z"
+  "temp": 28.5,
+  "rh_air": 65.2,
+  "rh_soil": 45.3,
+  "lux": 2435.983,
+  "ph": 6.5
 }
 ```
 
@@ -147,16 +147,9 @@ Hasil prediksi dipublish:
 ```json
 Topic: chilihub/predictions/class
 Payload: {
-  "class": 2,
-  "label": "Critical",
-  "confidence": 0.89,
-  "sensor_data": {
-    "temperature": 28.5,
-    "humidity": 65.2,
-    "soil_moisture": 45.3,
-    "light_intensity": 720
-  },
-  "timestamp": "2025-12-10T14:30:23Z"
+  "status": "CRITICAL",
+  "code": 2,
+  "timestamp": "18:29:23"
 }
 ```
 
@@ -179,7 +172,7 @@ ESP32 subscribe ke `chilihub/predictions/class`:
 ## 🛠️ Komponen Hardware
 
 ### Mikrokontroler
-- **ESP32 DevKit V1** - WiFi & Bluetooth SoC
+- **ESP32 Dev Board** - WiFi & Bluetooth SoC
 
 ### Sensor
 | Komponen | Model | Fungsi | Pin |
@@ -191,10 +184,10 @@ ESP32 subscribe ke `chilihub/predictions/class`:
 ### Aktuator
 | Komponen | Model | Fungsi | Pin |
 |----------|-------|--------|-----|
-| LED Hijau | 5mm Green LED | Indikator Normal | GPIO 25 |
-| LED Kuning | 5mm Yellow LED | Indikator Warning | GPIO 26 |
-| LED Merah | 5mm Red LED | Indikator Critical | GPIO 27 |
-| Servo Motor | SG90 | Simulasi pompa air | GPIO 13 (PWM) |
+| LED Hijau | 5mm Green LED | Indikator Normal | GPIO 12 |
+| LED Kuning | 5mm Yellow LED | Indikator Warning | GPIO 14 |
+| LED Merah | 5mm Red LED | Indikator Critical | GPIO 25 |
+| Servo Motor | SG90 | Simulasi pompa air | GPIO 23 (PWM) |
 
 ### Tambahan
 - Breadboard 830 points
@@ -212,9 +205,11 @@ ESP32 subscribe ke `chilihub/predictions/class`:
 - **Libraries**:
   - `WiFi.h` - Koneksi WiFi
   - `PubSubClient.h` - MQTT client
+  - `Wire.h` - Memfasilitasi komunikasi data menggunakan protokol I2C (Inter-Integrated Circuit)
   - `DHT.h` - DHT sensor driver
   - `ESP32Servo.h` - Servo control
   - `ArduinoJson.h` - JSON parsing
+  - `Adafruit_GFX.h` - OLED
 
 ### Backend & ML Pipeline
 - **Python 3.8+** - Core language
@@ -233,9 +228,7 @@ ESP32 subscribe ke `chilihub/predictions/class`:
 - **JSON** - Data exchange format
 
 ### Visualization
-- **Node-RED** - Flow-based dashboard
-- **Grafana** (Alternative) - Advanced visualization
-- **HTML/CSS/JS** (Alternative) - Custom web dashboard
+- **STREAMLIT** - Custom web dashboard
 
 ### Tools
 - **MQTTX** - MQTT client GUI untuk testing
@@ -249,133 +242,18 @@ ESP32 subscribe ke `chilihub/predictions/class`:
 ### 🔧 Prerequisite
 - Arduino IDE 2.x terinstall
 - Python 3.8+ terinstall
-- MQTT Broker (Mosquitto) berjalan
-- Node-RED terinstall (untuk dashboard)
-
-### 1️⃣ Clone Repository
-```bash
-git clone https://github.com/ugm-iot/chili-hub.git
-cd chili-hub
-```
-
-### 2️⃣ Setup MQTT Broker
-#### Linux/Mac
-```bash
-# Install Mosquitto
-sudo apt-get install mosquitto mosquitto-clients
-
-# Start service
-sudo systemctl start mosquitto
-sudo systemctl enable mosquitto
-
-# Test broker
-mosquitto_sub -h localhost -t test &
-mosquitto_pub -h localhost -t test -m "Hello MQTT"
-```
-
-#### Windows
-Download installer dari [mosquitto.org](https://mosquitto.org/download/), install, dan jalankan service.
-
-### 3️⃣ Upload Firmware ESP32
-1. Buka `esp32/chili_hub_iot/chili_hub_iot.ino`
-2. Edit `config.h`:
-```cpp
-#define WIFI_SSID "YourWiFiName"
-#define WIFI_PASSWORD "YourWiFiPassword"
-#define MQTT_BROKER "192.168.1.100"  // IP broker MQTT
-#define MQTT_PORT 1883
-```
-3. Install library yang diperlukan via Library Manager
-4. Select board: **ESP32 Dev Module**
-5. Upload ke ESP32
-
-### 4️⃣ Setup Python ML Pipeline
-```bash
-cd ml_pipeline
-
-# Create virtual environment
-python -m venv venv
-source venv/bin/activate  # Linux/Mac
-# atau
-venv\Scripts\activate  # Windows
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Copy .env.example ke .env dan edit
-cp .env.example .env
-nano .env
-```
-
-**File `.env`:**
-```env
-MQTT_BROKER=localhost
-MQTT_PORT=1883
-MQTT_USERNAME=
-MQTT_PASSWORD=
-MODEL_PATH=models/chili_model.pkl
-LOG_LEVEL=INFO
-```
-
-### 5️⃣ Setup Dashboard (Node-RED)
-```bash
-# Install Node-RED globally
-npm install -g node-red
-
-# Install dashboard nodes
-npm install node-red-dashboard
-
-# Start Node-RED
-node-red
-
-# Akses: http://localhost:1880
-```
-
-Import flow:
-1. Buka Node-RED editor (http://localhost:1880)
-2. Menu → Import → Clipboard
-3. Paste konten dari `dashboard/node-red-flow.json`
-4. Deploy
-
-Akses dashboard di: **http://localhost:1880/ui**
-
----
+- MQTT Broker (EMQX) berjalan
 
 ## 🚀 Menjalankan Sistem
 
-### Terminal 1: MQTT Broker
+### Terminal 1: Python ML Pipeline
 ```bash
-sudo systemctl start mosquitto
-# atau
-mosquitto -v  # verbose mode untuk debugging
-```
-
-### Terminal 2: Python ML Pipeline
-```bash
-cd ml_pipeline
-source venv/bin/activate
 python mqtt_listener.py
 ```
 
-Expected output:
-```
-[INFO] Starting Chili-Hub ML Pipeline...
-[INFO] Connecting to MQTT broker at localhost:1883
-[INFO] Connected successfully!
-[INFO] Subscribed to: chilihub/data/sensors
-[INFO] Waiting for sensor data...
-```
-
-### Terminal 3: Monitor MQTT (Opsional)
+### Terminal 2: Dashboard
 ```bash
-# Subscribe semua topic
-mosquitto_sub -h localhost -t 'chilihub/#' -v
-```
-
-### Terminal 4: Node-RED Dashboard
-```bash
-node-red
-# Akses: http://localhost:1880/ui
+streamlit run dashboard.py
 ```
 
 ### Hardware
@@ -391,61 +269,25 @@ node-red
 ![MQTTX](assets/MQTTX-Monitoring.png)
 *Monitoring real-time traffic MQTT menggunakan MQTTX client*
 
-**Cara capture screenshot:**
-- Connect ke broker `localhost:1883`
-- Subscribe ke `chilihub/#` (wildcard untuk semua topic)
-- Tunjukkan payload JSON yang masuk dari ESP32 dan Python
-
 ---
 
-### 2. Python Console Output
-![Python Console](assets/Python-ML-Console.png)
-*Log real-time dari ML pipeline menunjukkan preprocessing dan prediksi*
-
-**Contoh output ideal:**
-```
-[2025-12-10 14:30:22] [DATA] Received sensor data
-[2025-12-10 14:30:22] [PREPROCESS] Temperature: 28.5°C → Normalized: 0.71
-[2025-12-10 14:30:22] [PREPROCESS] Humidity: 65.2% → Normalized: 0.65
-[2025-12-10 14:30:22] [PREPROCESS] Soil: 45.3% → Normalized: 0.45
-[2025-12-10 14:30:22] [PREPROCESS] Light: 720 lux → Normalized: 0.72
-[2025-12-10 14:30:22] [MODEL] Prediction: Class 2 (Critical)
-[2025-12-10 14:30:22] [MODEL] Confidence: 89.3%
-[2025-12-10 14:30:22] [PUBLISH] Sent to chilihub/predictions/class
-```
+### 2. Dashboard Monitoring
+![Dashboard](assets/Python-ML-Console.png)
+*Monitoring real-time sensors data and prediction AI Model menggunakan streamlit*
 
 ---
-
-### 3. Node-RED Dashboard
-![Dashboard](assets/Dashboard-Overview.png)
-*Dashboard interaktif menampilkan semua metrik dan status prediksi*
 
 **Komponen dashboard:**
-- 🌡️ Temperature Gauge (0-50°C)
+- 🌡️ Temperature Gauge (0-100°C)
 - 💧 Humidity Gauge (0-100%)
 - 🌱 Soil Moisture Gauge (0-100%)
-- ☀️ Light Intensity Gauge (0-1000 lux)
+- ☀️ Light Intensity Gauge (0-100000 lux)
 - 📊 Time-series chart (last 24 hours)
 - 🚦 Status Card (Normal/Warning/Critical)
-- 📝 Prediction History Table
 
 ---
 
-### 4. Node-RED Flow
-![Flow](assets/NodeRED-Flow-ML.png)
-*Alur Node-RED untuk subscribe MQTT dan visualisasi*
-
-**Struktur flow:**
-```
-[MQTT In: sensors] → [JSON] → [Function: Parse] → [Gauges]
-                                                 → [Chart]
-[MQTT In: predictions] → [JSON] → [Function] → [Status Card]
-                                              → [Table]
-```
-
----
-
-### 5. Hardware Setup
+### 4. Hardware Setup
 ![Hardware](assets/ESP32-Hardware.jpg)
 *Rangkaian lengkap ESP32 dengan semua sensor dan aktuator*
 
@@ -457,19 +299,6 @@ node-red
 - ✅ 3 LED (hijau, kuning, merah) dengan resistor 220Ω
 - ✅ Servo motor SG90
 - ✅ Breadboard dengan wiring rapi
-
----
-
-### 6. Actuator Demo
-![Demo](assets/Actuator-Demo.gif)
-*Video/GIF demonstrasi aktuator merespon kondisi Critical*
-
-**Skenario demo:**
-1. Initial state: LED hijau menyala (Normal)
-2. Soil moisture turun drastis
-3. Model prediksi: Critical
-4. LED merah menyala + servo bergerak 180° (pompa ON)
-5. Tampilkan di dashboard status berubah menjadi "CRITICAL"
 
 ---
 
@@ -526,78 +355,6 @@ Classification Report:
 
 ---
 
-## 📁 Struktur Proyek
-
-```
-chili-hub/
-│
-├── 📄 README.md                 # Dokumentasi utama
-├── 📄 LICENSE                   # MIT License
-├── 📄 .gitignore               
-│
-├── 📂 assets/                   # Media & dokumentasi visual
-│   ├── logo.png
-│   ├── MQTTX-Monitoring.png
-│   ├── Python-ML-Console.png
-│   ├── Dashboard-Overview.png
-│   ├── NodeRED-Flow-ML.png
-│   ├── ESP32-Hardware.jpg
-│   ├── Actuator-Demo.gif
-│   └── Architecture-Diagram.png
-│
-├── 📂 esp32/                    # Firmware ESP32
-│   ├── chili_hub_iot/
-│   │   ├── chili_hub_iot.ino   # Main sketch
-│   │   ├── config.h            # WiFi & MQTT config
-│   │   ├── sensors.h           # Sensor functions
-│   │   └── actuators.h         # Actuator control
-│   └── libraries/              # Custom libraries (jika ada)
-│
-├── 📂 ml_pipeline/              # Python ML Pipeline
-│   ├── mqtt_listener.py        # Main script
-│   ├── preprocess.py           # Data preprocessing
-│   ├── model_inference.py      # Model prediction
-│   ├── config.py               # Configuration
-│   ├── requirements.txt        # Python dependencies
-│   ├── .env.example            # Environment template
-│   └── models/
-│       ├── chili_model.pkl     # Trained model
-│       └── scaler.pkl          # Feature scaler
-│
-├── 📂 training/                 # ML Training & Experiments
-│   ├── notebooks/
-│   │   ├── 01_EDA.ipynb        # Exploratory Data Analysis
-│   │   ├── 02_Training.ipynb  # Model training
-│   │   └── 03_Evaluation.ipynb
-│   ├── data/
-│   │   ├── raw/                # Dataset mentah
-│   │   ├── processed/          # Dataset terproses
-│   │   └── synthetic/          # Generated data
-│   └── scripts/
-│       ├── train_model.py
-│       └── evaluate_model.py
-│
-├── 📂 dashboard/                # Visualization
-│   ├── node-red/
-│   │   ├── flow.json           # Node-RED flow export
-│   │   └── settings.js         # Node-RED settings
-│   └── custom_dashboard/       # (Optional) Custom web
-│       ├── index.html
-│       ├── style.css
-│       └── app.js
-│
-├── 📂 docs/                     # Dokumentasi tambahan
-│   ├── architecture.md         # Arsitektur detail
-│   ├── hardware_setup.md       # Panduan hardware
-│   ├── mqtt_topics.md          # MQTT topic specification
-│   ├── api_reference.md        # API documentation
-│   └── troubleshooting.md      # Common issues & solutions
-│
-└── 📂 tests/                    # Testing scripts
-    ├── test_mqtt_pub.py        # Test MQTT publisher
-    ├── test_mqtt_sub.py        # Test MQTT subscriber
-    └── test_model.py           # Test ML model
-```
 
 ---
 
@@ -607,131 +364,17 @@ chili-hub/
 | Topic | QoS | Retain | Rate | Payload |
 |-------|-----|--------|------|---------|
 | `chilihub/data/sensors` | 1 | false | 5s | Sensor readings (JSON) |
-| `chilihub/status/esp32` | 1 | true | 60s | Device status |
-
-**Example Payload `chilihub/data/sensors`:**
-```json
-{
-  "device_id": "ESP32_001",
-  "temperature": 28.5,
-  "humidity": 65.2,
-  "soil_moisture": 45.3,
-  "light_intensity": 720,
-  "timestamp": "2025-12-10T14:30:22Z"
-}
-```
-
-### Published by Python ML Pipeline
-| Topic | QoS | Retain | Rate | Payload |
-|-------|-----|--------|------|---------|
-| `chilihub/predictions/class` | 1 | false | 5s | ML prediction (JSON) |
-| `chilihub/status/ml_pipeline` | 1 | true | 60s | Pipeline status |
-
-**Example Payload `chilihub/predictions/class`:**
-```json
-{
-  "prediction": {
-    "class": 2,
-    "label": "Critical",
-    "confidence": 0.893
-  },
-  "sensor_snapshot": {
-    "temperature": 28.5,
-    "humidity": 65.2,
-    "soil_moisture": 45.3,
-    "light_intensity": 720
-  },
-  "timestamp": "2025-12-10T14:30:23Z"
-}
-```
 
 ### Subscribed by ESP32
 | Topic | Purpose |
 |-------|---------|
 | `chilihub/predictions/class` | Receive ML predictions untuk kontrol aktuator |
-| `chilihub/commands/actuator` | Manual override commands (future) |
 
 ### Subscribed by Dashboard
 | Topic | Purpose |
 |-------|---------|
 | `chilihub/data/sensors` | Display real-time sensor data |
 | `chilihub/predictions/class` | Display prediction status |
-
----
-
-## 🧪 Testing & Debugging
-
-### Test MQTT Connection
-```bash
-# Terminal 1: Subscribe
-mosquitto_sub -h localhost -t 'chilihub/#' -v
-
-# Terminal 2: Publish test data
-mosquitto_pub -h localhost -t 'chilihub/data/sensors' \
-  -m '{"temperature":25.5,"humidity":70.0,"soil_moisture":65.0,"light_intensity":500}'
-```
-
-### Test Python ML Pipeline
-```bash
-cd ml_pipeline
-python test_model.py
-```
-
-### Monitor Serial Output ESP32
-```bash
-# Arduino IDE: Tools → Serial Monitor (115200 baud)
-# atau menggunakan screen
-screen /dev/ttyUSB0 115200
-```
-
-### Debug Node-RED Flow
-1. Enable debug nodes
-2. Open debug panel (sidebar kanan)
-3. Watch message flow
-
----
-
-## 🐛 Troubleshooting
-
-### ESP32 tidak connect WiFi
-```
-❌ Problem: Serial monitor menunjukkan "WiFi connection failed"
-✅ Solution:
-   1. Periksa SSID dan password di config.h
-   2. Pastikan WiFi 2.4GHz (ESP32 tidak support 5GHz)
-   3. Restart ESP32
-   4. Check WiFi signal strength
-```
-
-### Python tidak bisa connect ke MQTT
-```
-❌ Problem: "Connection refused" atau timeout
-✅ Solution:
-   1. Cek Mosquitto service: sudo systemctl status mosquitto
-   2. Verify broker IP di .env
-   3. Cek firewall: sudo ufw allow 1883
-   4. Test dengan: mosquitto_sub -h localhost -t test
-```
-
-### Model prediction tidak akurat
-```
-❌ Problem: Prediksi tidak sesuai ekspektasi
-✅ Solution:
-   1. Periksa preprocessing (normalisasi range harus sama dengan training)
-   2. Verify model file (.pkl) tidak corrupt
-   3. Check feature order saat inference
-   4. Retrain model dengan data lebih banyak
-```
-
-### Dashboard tidak update
-```
-❌ Problem: Gauge/chart tidak bergerak
-✅ Solution:
-   1. Check MQTT connection di Node-RED (status harus "connected")
-   2. Verify topic subscription
-   3. Clear browser cache
-   4. Restart Node-RED: node-red-restart
-```
 
 ---
 
@@ -764,36 +407,6 @@ screen /dev/ttyUSB0 115200
 - [ ] **B2B Dashboard**: Multi-tenant architecture
 - [ ] **API Marketplace**: Public API untuk third-party
 - [ ] **Hardware Kit**: DIY package untuk petani
-
----
-
-## 🤝 Kontribusi
-
-Kami sangat terbuka untuk kontribusi! Berikut cara berkontribusi:
-
-### Cara Berkontribusi
-1. **Fork** repository ini
-2. Buat **branch** baru (`git checkout -b feature/AmazingFeature`)
-3. **Commit** perubahan (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** ke branch (`git push origin feature/AmazingFeature`)
-5. Buat **Pull Request**
-
-### Coding Standards
-- **Python**: Follow PEP 8
-- **C++/Arduino**: Follow Arduino Style Guide
-- **Commit message**: Gunakan conventional commits
-  ```
-  feat: add new sensor support
-  fix: resolve MQTT connection timeout
-  docs: update installation guide
-  ```
-
-### Areas for Contribution
-- 🐛 Bug fixes
-- 📝 Documentation improvement
-- ✨ New features
-- 🧪 Testing & quality assurance
-- 🌐 Internationalization (i18n)
 
 ---
 
