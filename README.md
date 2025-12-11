@@ -129,8 +129,7 @@ Payload: {
   "temp": 28.5,
   "rh_air": 65.2,
   "rh_soil": 45.3,
-  "lux": 2435.983,
-  "ph": 6.5
+  "lux": 2435.983
 }
 ```
 
@@ -272,7 +271,7 @@ streamlit run dashboard.py
 ---
 
 ### 2. Dashboard Monitoring
-![Dashboard](assets/Python-ML-Console.png)
+![Dashboard](assets/Dashboard.png)
 *Monitoring real-time sensors data and prediction AI Model menggunakan streamlit*
 
 ---
@@ -328,29 +327,27 @@ streamlit run dashboard.py
 X_normalized = (X - X_min) / (X_max - X_min)
 
 # Features:
-# - temperature: [15.0 - 40.0] °C
+# - temperature: [0 - 100.0] °C
 # - humidity: [30.0 - 95.0] %
 # - soil_moisture: [0.0 - 100.0] %
-# - light_intensity: [0 - 1000] lux
+# - light_intensity: [0 - 100000] lux
 ```
 
 ### Classification Logic
 | Kondisi | Temperature | Humidity | Soil Moisture | Light | Class |
 |---------|-------------|----------|---------------|-------|-------|
-| Ideal | 24-28°C | 60-80% | 60-80% | 400-800 lux | Normal |
-| Sub-optimal | ±3°C | ±10% | ±10% | ±200 lux | Warning |
-| Buruk | >±5°C | >±20% | <50% or >90% | <200 or >900 | Critical |
+| Ideal | 18-26°C | 65-85% | 60-80% | 8000-10000 lux | Normal |
 
 ### Model Performance
 ```
 Classification Report:
               precision    recall  f1-score   support
 
-      Normal       0.93      0.95      0.94       450
-     Warning       0.89      0.87      0.88       300
-    Critical       0.94      0.93      0.94       250
+      Normal       1.00      1.00      1.00        24
+     Warning       1.00      1.00      1.00        18
+    Critical       1.00      1.00      1.00        18
 
-    accuracy                           0.92      1000
+    accuracy                           1.00        60
 ```
 
 ---
@@ -410,10 +407,8 @@ Classification Report:
 
 ---
 
-## 👥 Tim Pengembang
-
-<table>
-  <tr>
-    <td align="center">
-      <img src="https://via.placeholder.com/150" width="100px;" alt="Arnold"/><br />
-      <sub><b>Arnold G. B. S.
+## 👥 Anggota Tim Pengembang
+- Arnold G. B. S.
+- Garjita Adicandra
+- Muhammad Nabil Fitriansyah Boernama
+- Rian Prasetya Munaji
