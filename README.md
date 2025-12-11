@@ -360,7 +360,7 @@ Classification Report:
 ### Published by ESP32
 | Topic | QoS | Retain | Rate | Payload |
 |-------|-----|--------|------|---------|
-| `chilihub/data/sensors` | 1 | false | 5s | Sensor readings (JSON) |
+| `chilihub/data/sensors` | 0 | false | 5s | Sensor readings (JSON) |
 
 ### Subscribed by ESP32
 | Topic | Purpose |
@@ -384,21 +384,21 @@ Classification Report:
 - [x] Basic dashboard
 - [x] Automated actuator control
 
-### Phase 2: Enhancement 🚧 (Q1 2025)
+### Phase 2: Enhancement 🚧 (Q1 2026)
 - [ ] **Computer Vision**: ESP32-CAM untuk deteksi penyakit daun
 - [ ] **Weather API Integration**: Data cuaca eksternal
 - [ ] **Mobile App**: Flutter app untuk monitoring
 - [ ] **Alert System**: Telegram/WhatsApp notification
 - [ ] **Multi-device Support**: Kontrol multiple greenhouse
 
-### Phase 3: Advanced Features 🔮 (Q2 2025)
+### Phase 3: Advanced Features 🔮 (Q2 2026)
 - [ ] **Edge AI**: Deploy TensorFlow Lite model ke ESP32
 - [ ] **Predictive Analytics**: Forecast kondisi 24 jam ke depan
 - [ ] **Historical Analysis**: Big data analytics dengan InfluxDB
 - [ ] **Automated Reporting**: Weekly/monthly PDF report
 - [ ] **Voice Control**: Integrasi Google Assistant/Alexa
 
-### Phase 4: Scale & Commercialization 💼 (Q3 2025)
+### Phase 4: Scale & Commercialization 💼 (Q3 2026)
 - [ ] **Multi-crop Support**: Tomat, paprika, strawberry
 - [ ] **Cloud Platform**: AWS/GCP deployment
 - [ ] **B2B Dashboard**: Multi-tenant architecture
