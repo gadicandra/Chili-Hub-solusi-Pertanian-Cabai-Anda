@@ -287,7 +287,7 @@ streamlit run dashboard.py
 ---
 
 ### 4. Hardware Setup
-![Hardware](assets/ESP32-Hardware.jpg)
+![Hardware](assets/ESP32-Hardware.png)
 *Rangkaian lengkap ESP32 dengan semua sensor dan aktuator*
 
 **Checklist foto:**
