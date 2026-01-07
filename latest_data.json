@@ -1,1 +1,1 @@
-{"temp": 25.7, "rh_air": 86.8, "rh_soil": 8, "lux": 1012.377, "ph": 6.5, "timestamp": "18:29:23"}
+{"temp": 28.7, "rh_air": 74.8, "rh_soil": 0, "lux": 1192.836, "sensor_health": {"dht_ok": true, "photo_ok": true, "soil_ok": true}, "timestamp": "21:08:18"}
