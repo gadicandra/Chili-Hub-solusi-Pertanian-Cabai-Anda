@@ -42,7 +42,7 @@ mqtt_client = setup_mqtt_client()
 # ==========================================
 @st.cache_resource
 def get_model():
-    model_path = 'model_sensor_final.pkl'
+    model_path = 'model_final.pkl'
     expected_features = ['earth_humidity', 'air_temperature', 'air_humidity', 'luminance']
     
     if os.path.exists(model_path):

@@ -225,13 +225,13 @@ void actuateBasedOnCode(int code) {
 
         case 1: // Warning - Yellow LED
             digitalWrite(YELLOW_LED_PIN, HIGH);
-            if (currentServoPos != 0) {
+            if (currentServoPos != 45) {
                 myServo.attach(SERVO_PIN);
-                myServo.write(0);
+                myServo.write(45);
                 delay(500);
                 myServo.detach();
-                currentServoPos = 0;
-                Serial.println("Servo → 0° (Closed)");
+                currentServoPos = 45;
+                Serial.println("Servo → 45° (Warning)");
             }
             break;
 
@@ -253,7 +253,6 @@ void actuateBasedOnCode(int code) {
 }
 
 // ------------------- Reading & Publishing ------------------- //
-
 void readSensors() {
     // ===== 1. DHT22 Temperature & Humidity ===== //
     temp1 = dht1.readTemperature();
@@ -273,7 +272,7 @@ void readSensors() {
         humidity1 = DEFAULT_HUMIDITY_AIR;
     } 
     // Validasi range nilai yang wajar
-    else if (temp1 < -40 || temp1 > 80 || humidity1 < 0 || humidity1 > 100) {
+    else if (temp1 < 5 || temp1 > 45 || humidity1 < 0 || humidity1 > 100) {
         sensorStatus.dht_fail_count++;
         Serial.println("⚠️  DHT22 values out of range");
         
@@ -303,11 +302,6 @@ void readSensors() {
         sensorStatus.photo_fail_count = 0;
         sensorStatus.photo_ok = true;
         lightValue = convertToLux(lightValueADC);
-        
-        // Validasi hasil konversi
-        if (lightValue < 0 || lightValue > 100000) {
-            lightValue = DEFAULT_LUX;
-        }
     }
     
     // ===== 3. Soil Moisture Sensor ===== //
